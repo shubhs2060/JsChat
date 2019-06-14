@@ -2,12 +2,12 @@
 <html>
   <head>
 			<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <title>Socket.IO chat</title>
+    <title>Secret chat</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
       form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form input { border: 0; padding: 10px; width: 70%; margin-right: .5%; }
       form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
@@ -15,9 +15,11 @@
     </style>
   </head>
   <body>
-    <ul id="messages"></ul>
+		<ul id="messages"></ul>
     <form action="">
-			<input id="m" autocomplete="off" /><button>Send</button>
+			<input id="m" autocomplete="off" />
+			<input id="upload" type="file" style="color:white;width: 15%;" />
+			<button>Send</button>
 			<p id="typeMessage" style="color:white;display: none;"></p>
 		</form>
     <script src="/socket.io/socket.io.js"></script>
@@ -26,12 +28,33 @@ $(function () {
 	var socket = io();
 	$('form').submit(function(e){
 		e.preventDefault(); // prevents page reloading
-		socket.emit('chat message', $('#m').val());
-		$('#m').val('');
+		if($('#m').val() != ''){
+			socket.emit('chat message', $('#m').val());
+			$('#m').val('');
+		}
+		if($('#upload')[0].files.length != 0){
+			var reader = new FileReader();
+			var image = $('#upload')[0].files[0]
+			reader.readAsDataURL(image);
+			reader.onloadend = function(){
+					var base64 = this.result;
+					socket.emit('image message', base64);
+			};
+			$("#upload").val(null);
+		}
+		$("html,body").animate({scrollTop: $('ul#messages li:last').offset().top - 100});
+
+		// $('#messages').scrollTop($('#messages').height())
+
+
 		return false;
 	});
 	socket.on('chat message', function(msg){
 		$('#messages').append($('<li>').text(msg));
+	});
+	socket.on('image message', function(msg){
+		console.log(msg)
+		$('#messages').append('<li><img style="height:400px;width:400px;" src="'+ msg + '"/></li>')
 	});
 	
 	$("#m").keyup(function() {
@@ -42,7 +65,7 @@ $(function () {
 		$('#typeMessage').text(msg).fadeIn();
 		setTimeout(function () {
       $("#typeMessage").text("").fadeOut();
-    }, 3000);
+		}, 3000);
 	});
 });
 

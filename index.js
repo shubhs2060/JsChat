@@ -17,6 +17,9 @@ io.on('connection', function(socket){
     socket.on('type message', function(msg){
         io.emit('type message', msg);
     });
+    socket.on('image message', function(msg){
+        io.emit('image message', msg);
+    });
   });  
 
 http.listen(process.env.PORT || 3000, function(){
