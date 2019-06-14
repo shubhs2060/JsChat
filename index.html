@@ -16,6 +16,7 @@
   </head>
   <body>
 		<ul id="messages"></ul>
+		<p id="Imessage" style="display:none;">Image Uploading...</p>
     <form action="">
 			<input id="m" autocomplete="off" />
 			<input id="upload" type="file" style="color:white;width: 15%;" />
@@ -39,10 +40,11 @@ $(function () {
 			reader.onloadend = function(){
 					var base64 = this.result;
 					socket.emit('image message', base64);
+					$("#Imessage").show();
 			};
 			$("#upload").val(null);
 		}
-		// $("html,body").animate({scrollTop: $('ul#messages li:last').offset().top - 100});
+		$("html,body").animate({scrollTop: $('ul#messages li:last').offset().top - 100});
 
 		// $('#messages').scrollTop($('#messages').height())
 
@@ -53,7 +55,7 @@ $(function () {
 		$('#messages').append($('<li>').text(msg));
 	});
 	socket.on('image message', function(msg){
-		console.log(msg)
+		$("#Imessage").hide();
 		$('#messages').append('<li><img style="height:400px;width:400px;" src="'+ msg + '"/></li>')
 	});
 	
