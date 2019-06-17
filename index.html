@@ -15,6 +15,7 @@
     </style>
   </head>
   <body>
+		<p id="clients" style="color:tomato"></p>
 		<ul id="messages"></ul>
 		<p id="Imessage" style="display:none;">Image Uploading...</p>
     <form action="">
@@ -50,6 +51,9 @@ $(function () {
 
 
 		return false;
+	});
+	socket.on('broadcast', function(msg){
+		$('#clients').text(msg + ' clients are connected');
 	});
 	socket.on('chat message', function(msg){
 		$('#messages').append($('<li>').text(msg));

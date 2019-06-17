@@ -6,11 +6,17 @@ app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
 });
 
+var clients = 0
 io.on('connection', function(socket){
+    clients ++
+    io.sockets.emit('broadcast',clients);
+
     console.log('a user connected');
     socket.on('disconnect', function(){
-        console.log('user disconnected');
-      });
+      clients --
+      io.sockets.emit('broadcast',clients);
+      console.log('user disconnected');
+    });
     socket.on('chat message', function(msg){
         io.emit('chat message', msg);
     });
